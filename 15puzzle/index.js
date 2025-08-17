@@ -40,7 +40,10 @@ function togglePause() {
     }
 }
 
-
+function stopTimer() {
+    clearInterval(timer);
+    timer = null;
+}
 
 const gridCon = document.getElementById("grid");
 const rows = 4;
@@ -181,6 +184,9 @@ function handleClick(e) {
         colElements.forEach((col) => {
             col.removeEventListener("click", handleClick);
             document.getElementById("win").style.display = "flex";
+            stopTimer();
+            document.getElementById("pauseBtn").style.display = "none";
+
         });
     }
 
