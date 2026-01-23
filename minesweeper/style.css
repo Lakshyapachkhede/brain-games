@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+:root {
+    --cell-size: 50px;
+    --img-size: calc(var(--cell-size) - 10px);
+}
+
+body {
+    max-width: 80vw;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, var(--cell-size));
+    grid-template-rows: repeat(9, var(--cell-size));
+    width: fit-content;
+    gap: 1px;
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    cursor: pointer;
+    background-color: white;
+    font-size: 25px;
+}
+
+.cell img {
+    width: var(--img-size);
+    height: var(--img-size);
+}
+
+
+.cell-closed {
+    background-color: rgb(46, 120, 218);
+}
+
+.cell-1 {
+    color: blue;
+}
+
+.cell-2 {
+    color: green;
+}
+
+.cell-3 {
+    color: red;
+}
+
+@media screen and (max-width:800px) {
+    :root {
+        --cell-size: 30px;
+    }
+    body{
+        max-width: unset;
+    }
+}
