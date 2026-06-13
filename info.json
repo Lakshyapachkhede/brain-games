@@ -1,0 +1,30 @@
+[
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/sudoku/index.html",
+        "name": "Sudoku"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/15puzzle/index.html",
+        "name": "15 puzzle"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/antSmasher/index.html",
+        "name": "Ant Smasher"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/minesweeper/index.html",
+        "name": "Minesweeper"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/tic_tac_toe/index.html",
+        "name": "Tic Tac Toe"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/snake/index.html",
+        "name": "Snake"
+    },
+    {
+        "url": "https://lakshyapachkhede.github.io/brain-games/dice/index.html",
+        "name": "Roll A Dice"
+    }
+]

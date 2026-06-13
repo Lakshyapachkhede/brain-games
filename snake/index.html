@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Game</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    background:#111;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+#game-container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    padding:10px;
+}
+
+#score{
+    font-size:24px;
+    font-weight:bold;
+}
+
+canvas{
+    background:#000;
+    border:2px solid #fff;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,255,0,.3);
+    touch-action:none;
+}
+
+#controls{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+}
+
+#controls div{
+    display:flex;
+    gap:8px;
+}
+
+#controls button{
+    width:70px;
+    height:70px;
+    border:none;
+    border-radius:12px;
+    font-size:28px;
+    cursor:pointer;
+    background:#222;
+    color:white;
+}
+
+#controls button:active{
+    transform:scale(.95);
+}
+
+@media (min-width:768px){
+    #controls{
+        opacity:.85;
+    }
+}
+</style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <div id="score">Score: 0</div>
+
+    <canvas id="game"></canvas>
+
+    <div id="controls">
+        <button onclick="move('up')">⬆️</button>
+
+        <div>
+            <button onclick="move('left')">⬅️</button>
+            <button onclick="move('down')">⬇️</button>
+            <button onclick="move('right')">➡️</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const scoreElement = document.getElementById("score");
+
+const GRID = 16;
+const FPS_DIVIDER = 8;
+
+const CONFIG = {
+    initialLength: 4
+};
+
+const state = {
+    frameCount: 0,
+    score: 0,
+
+    snake: {
+        x: 0,
+        y: 0,
+        dx: GRID,
+        dy: 0,
+        cells: [],
+        maxCells: CONFIG.initialLength
+    },
+
+    apple: {
+        x: 0,
+        y: 0
+    }
+};
+
+function resizeCanvas() {
+
+    let size = Math.min(window.innerWidth * 0.9, 500);
+
+    size = Math.floor(size / GRID) * GRID;
+
+    canvas.width = size;
+    canvas.height = size;
+
+    resetGame();
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+function getRandomInt(min,max){
+    return Math.floor(Math.random()*(max-min))+min;
+}
+
+function randomGridPosition(){
+
+    const cols = canvas.width / GRID;
+
+    return {
+        x: getRandomInt(0, cols) * GRID,
+        y: getRandomInt(0, cols) * GRID
+    };
+}
+
+function updateScore(){
+    scoreElement.textContent = `Score: ${state.score}`;
+}
+
+function spawnApple(){
+    state.apple = randomGridPosition();
+}
+
+function resetGame(){
+
+    const center =
+        Math.floor((canvas.width / GRID) / 2) * GRID;
+
+    state.snake.x = center;
+    state.snake.y = center;
+
+    state.snake.dx = GRID;
+    state.snake.dy = 0;
+
+    state.snake.cells = [];
+    state.snake.maxCells = CONFIG.initialLength;
+
+    state.score = 0;
+    updateScore();
+
+    spawnApple();
+}
+
+function eatApple(){
+
+    state.snake.maxCells++;
+    state.score++;
+
+    updateScore();
+    spawnApple();
+}
+
+function setDirection(direction){
+
+    const snake = state.snake;
+
+    switch(direction){
+
+        case "left":
+            if(snake.dx !== 0) return;
+            snake.dx = -GRID;
+            snake.dy = 0;
+            break;
+
+        case "right":
+            if(snake.dx !== 0) return;
+            snake.dx = GRID;
+            snake.dy = 0;
+            break;
+
+        case "up":
+            if(snake.dy !== 0) return;
+            snake.dx = 0;
+            snake.dy = -GRID;
+            break;
+
+        case "down":
+            if(snake.dy !== 0) return;
+            snake.dx = 0;
+            snake.dy = GRID;
+            break;
+    }
+}
+
+function move(direction){
+    setDirection(direction);
+}
+
+document.addEventListener("keydown", e => {
+
+    const directions = {
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        ArrowUp: "up",
+        ArrowDown: "down"
+    };
+
+    const direction = directions[e.key];
+
+    if(direction){
+        setDirection(direction);
+    }
+});
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener("touchstart", e => {
+
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+
+}, { passive:true });
+
+canvas.addEventListener("touchend", e => {
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+
+    if(Math.abs(dx) > Math.abs(dy)){
+        setDirection(dx > 0 ? "right" : "left");
+    }
+    else{
+        setDirection(dy > 0 ? "down" : "up");
+    }
+
+}, { passive:true });
+
+function moveSnake(){
+
+    const snake = state.snake;
+
+    snake.x += snake.dx;
+    snake.y += snake.dy;
+
+    if(snake.x < 0){
+        snake.x = canvas.width - GRID;
+    }
+    else if(snake.x >= canvas.width){
+        snake.x = 0;
+    }
+
+    if(snake.y < 0){
+        snake.y = canvas.height - GRID;
+    }
+    else if(snake.y >= canvas.height){
+        snake.y = 0;
+    }
+
+    snake.cells.unshift({
+        x: snake.x,
+        y: snake.y
+    });
+
+    if(snake.cells.length > snake.maxCells){
+        snake.cells.pop();
+    }
+}
+
+function checkAppleCollision(){
+
+    const head = state.snake.cells[0];
+
+    if(
+        head &&
+        head.x === state.apple.x &&
+        head.y === state.apple.y
+    ){
+        eatApple();
+    }
+}
+
+function checkSelfCollision(){
+
+    const snake = state.snake;
+
+    const head = snake.cells[0];
+
+    for(let i=1;i<snake.cells.length;i++){
+
+        if(
+            head.x === snake.cells[i].x &&
+            head.y === snake.cells[i].y
+        ){
+            resetGame();
+            return;
+        }
+    }
+}
+
+function drawApple(){
+
+    ctx.fillStyle = "#ff3b30";
+
+    ctx.fillRect(
+        state.apple.x,
+        state.apple.y,
+        GRID - 1,
+        GRID - 1
+    );
+}
+
+function drawSnake(){
+
+    state.snake.cells.forEach((cell,index)=>{
+
+        ctx.fillStyle =
+            index === 0 ? "#00ff66" : "#00cc55";
+
+        ctx.fillRect(
+            cell.x,
+            cell.y,
+            GRID - 1,
+            GRID - 1
+        );
+    });
+}
+
+function render(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    drawApple();
+    drawSnake();
+}
+
+function gameLoop(){
+
+    requestAnimationFrame(gameLoop);
+
+    if(++state.frameCount < FPS_DIVIDER){
+        return;
+    }
+
+    state.frameCount = 0;
+
+    moveSnake();
+    checkAppleCollision();
+    checkSelfCollision();
+    render();
+}
+
+resizeCanvas();
+requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>
+
